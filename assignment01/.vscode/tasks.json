@@ -1,0 +1,56 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "producer_build",
+            "command": "/usr/bin/gcc",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${workspaceFolder}/src/producer.c",
+                "-lrt",
+                "-o",
+                "${workspaceFolder}/bin/producer.o"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "type": "cppbuild",
+            "label": "consumer_build",
+            "command": "/usr/bin/gcc",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${workspaceFolder}/src/consumer.c",
+                "-lrt",
+                "-o",
+                "${workspaceFolder}/bin/consumer.o"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Build Assignment 1",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "producer_build",
+                "consumer_build"
+            ],
+            "detail": "Build producer and consumer"
+        }
+    ],
+    "version": "2.0.0"
+}

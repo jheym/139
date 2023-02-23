@@ -112,13 +112,21 @@ void InitShm(int bufSize, int itemCnt)
 	// Use the above name.
 	// **Extremely ImportPant: map the shared memory block for both reading and writing
 	// Use PROT_READ | PROT_WRITE
-	char *shm_fd;
+	int shm_fd;
 	shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
+	ftruncate(shm_fd, bufSize);
 	gShmPtr = mmap(NULL, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
 	// Write code here to set the values of the four integers in the header
 	// Just call the functions provided below, like this
 	SetBufSize(bufSize);
+	SetItemCnt(itemCnt);
+	SetIn(0);
+	SetOut(0);
+
+	// Debugging
+	printf("Header value 1 (buffsize): %d\n", GetHeaderVal(0));
+
 }
 
 void Producer(int bufSize, int itemCnt, int randSeed)
@@ -176,7 +184,10 @@ int GetHeaderVal(int i)
 // Set the ith value in the header
 void SetHeaderVal(int i, int val)
 {
-	// Write the implementation
+	memset(gShmPtr + i * sizeof(int), val, 4);
+	printf("sharedmem in set: %d \n", &gShmPtr);
+	// void *ptr = gShmPtr + i * sizeof(int);
+	// memset(ptr + i, val, i * sizeof(int));
 }
 
 // Get the value of shared variable "bufSize"
