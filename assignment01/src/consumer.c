@@ -4,7 +4,7 @@ Spring 2023
 First Assignment
 Heyman, Justin
 Section 2
-OSs Tested on: Ubuntu-22.04 (GCC 11.3.0)
+OSs Tested on: Ubuntu-22.04 (GCC 11.3.0, -std=c89)
 */
 
 #include <stdio.h>

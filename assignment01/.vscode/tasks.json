@@ -28,6 +28,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${workspaceFolder}/src/consumer.c",
+                "-std=gnu89",
                 "-lrt",
                 "-o",
                 "${workspaceFolder}/bin/consumer.o"
