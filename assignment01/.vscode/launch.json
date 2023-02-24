@@ -1,11 +1,11 @@
 {
     "configurations": [
         {
-            "name": "Debug Assignment01",
+            "name": "producer",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/producer.o",
-            "args": ["512", "1000", "85294446"],
+            "program": "${workspaceFolder}/bin/producer",
+            "args": ["3", "20", "$RANDOM"], // buffSize, numItems, seed
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

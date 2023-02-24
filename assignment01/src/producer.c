@@ -4,7 +4,8 @@ Spring 2023
 First Assignment
 Heyman, Justin
 Section 2
-OSs Tested on: Ubuntu-22.04 (GCC 11.3.0)
+OSs Tested on: 	Ubuntu-22.04, GCC 11.3.0, -std=gnu89
+				RHEL-7.9, GCC 4.8.5, -std=gnu89 [ecs-pa-coding1] 
 */
 
 #include <stdio.h>
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 	pid_t pid;
 	int bufSize;	// Bounded buffer size
 	int itemCnt;	// Number of items to be produced
-	int randSeed; // Seed for the random number generator
+	int randSeed; 	// Seed for the random number generator
 
 	if (argc != 4)
 	{
@@ -114,7 +115,8 @@ void InitShm(int bufSize, int itemCnt)
 	// Use PROT_READ | PROT_WRITE
 	int shm_fd;
 	shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
-	ftruncate(shm_fd, bufSize);
+	ftruncate(shm_fd, SHM_SIZE);
+	// Creates a shared memory block 4096 bytes long
 	gShmPtr = mmap(NULL, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
 	// Write code here to set the values of the four integers in the header
@@ -125,17 +127,22 @@ void InitShm(int bufSize, int itemCnt)
 	SetOut(0);
 
 	// Debugging
-	printf("Header value 1 (buffsize): %d\n", GetHeaderVal(0));
+	// int headerVal0 = GetHeaderVal(0);
+	// int headerVal1 = GetHeaderVal(1);
+	// int headerVal2 = GetHeaderVal(2);
+	// int headerVal3 = GetHeaderVal(3);
 
 }
 
 void Producer(int bufSize, int itemCnt, int randSeed)
 {
-	int in = 0;
-	int out = 0;
-
+	
+	int in = 0; // Index of next item to be produced
+	int out = 0; // Index of next item to be consumed
+	int i = 1; // Item number
+	
 	srand(randSeed);
-
+	
 	// Write code here to produce itemCnt integer values in the range [10-2500]
 	// Use the functions provided below to get/set the values of shared variables "in" and "out"
 	// Use the provided function WriteAtBufIndex() to write into the bounded buffer
@@ -144,6 +151,16 @@ void Producer(int bufSize, int itemCnt, int randSeed)
 	// Use the following print statement to report the production of an item:
 	// printf("Producing Item %d with value %d at Index %d\n", i, val, in);
 	// where i is the item number, val is the item value, in is its index in the bounded buffer
+
+	for (i = 1; i <= itemCnt; i++) {
+		in = GetIn();
+		while (((in + 1) % bufSize) == GetOut()); // Wait until there is space in the buffer
+		int val = GetRand(10, 2500);
+		WriteAtBufIndex(in, val);
+		printf("Producing Item %d with value %d at Index %d\n", i, val, in);
+		in = (in + 1) % bufSize;
+		SetIn(in);
+	}
 
 	printf("Producer Completed\n");
 }
@@ -160,19 +177,20 @@ void SetItemCnt(int val)
 	SetHeaderVal(1, val);
 }
 
-// Set the value of shared variable "in"
+// Set the value of shared variable "in". The value is an index in the bounded buffer.
 void SetIn(int val)
 {
 	SetHeaderVal(2, val);
 }
 
-// Set the value of shared variable "out"
+// Set the value of shared variable "out". The value is an index in the bounded buffer.
 void SetOut(int val)
 {
 	SetHeaderVal(3, val);
 }
 
 // Get the ith value in the header
+// 1st value is bufSize, 2nd is itemCnt, 3rd is in, 4th is out
 int GetHeaderVal(int i)
 {
 	int val;
@@ -184,10 +202,8 @@ int GetHeaderVal(int i)
 // Set the ith value in the header
 void SetHeaderVal(int i, int val)
 {
-	memset(gShmPtr + i * sizeof(int), val, 4);
-	printf("sharedmem in set: %d \n", &gShmPtr);
-	// void *ptr = gShmPtr + i * sizeof(int);
-	// memset(ptr + i, val, i * sizeof(int));
+	void *ptr = gShmPtr + i * sizeof(int);
+	memcpy(ptr, &val, sizeof(int));
 }
 
 // Get the value of shared variable "bufSize"
@@ -225,7 +241,11 @@ void WriteAtBufIndex(int indx, int val)
 // Read the val at the given index in the bounded buffer
 int ReadAtBufIndex(int indx)
 {
-	// Write the implementation
+	int val;
+	// Skip the four-integer header and go to the given index
+	void *ptr = gShmPtr + 4 * sizeof(int) + indx * sizeof(int);
+	memcpy(&val, ptr, sizeof(int));
+	return val;
 }
 
 // Get a random number in the range [x, y]
