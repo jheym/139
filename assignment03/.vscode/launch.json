@@ -1,15 +1,12 @@
 {
+  "version": "0.2.0",
   "configurations": [
     {
-      "name": "producer",
+      "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/producer",
-      "args": [
-        "3",
-        "10",
-        "$RANDOM"
-      ],
+      "program": "${workspaceFolder}/main.o",
+      "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
       "environment": [],
@@ -35,8 +32,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/jheym/139/assignment01/src",
-      "program": "/home/jheym/139/assignment01/src/build/Debug/outDebug",
+      "cwd": "/home/jheym/139/assignment03",
+      "program": "/home/jheym/139/assignment03/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "/usr/bin/gdb",
       "setupCommands": [
@@ -47,6 +44,5 @@
         }
       ]
     }
-  ],
-  "version": "2.0.0"
+  ]
 }

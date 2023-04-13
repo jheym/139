@@ -154,7 +154,7 @@ void Producer(int bufSize, int itemCnt, int randSeed)
 
 	for (i = 1; i <= itemCnt; i++) {
 		in = GetIn();
-		while (((in + 1) % bufSize) == GetOut()); // Wait until there is space in the buffer
+		while (((in + 1) % bufSize) == GetOut()); // "busy waiting" until there is space in the buffer
 		int val = GetRand(10, 2500);
 		WriteAtBufIndex(in, val);
 		printf("Producing Item %d with value %d at Index %d\n", i, val, in);

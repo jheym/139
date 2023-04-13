@@ -86,7 +86,7 @@ int main()
 	// where i is the item number, val is the item value, out is its index in the bounded buffer
 	
 	for (i = 1; i <= itemCnt; i++) {
-		while (GetIn() == out); // Wait until there is an item to consume
+		while (in == out); // Wait until there is an item to consume
 		int val = ReadAtBufIndex(out);
 		printf("Consuming Item %d with value %d at Index %d\n", i, val, out);
 		out = (out + 1) % bufSize; // Increment out
