@@ -7,19 +7,20 @@
 
 #include "helper.h"
 
-struct entry {
+
+struct rr_q_item {
     Process *process;
-    STAILQ_ENTRY(entry) entries; /* Singly linked tail queue. */
+    STAILQ_ENTRY(rr_q_item) entries; /* Singly linked tail queue. */
 };
 
-STAILQ_HEAD(stailhead, entry); // Declare the head of the queue
+STAILQ_HEAD(rr_q_head, rr_q_item); // Declare the head of the queue
 
-void print_wq(struct stailhead *head);
+void print_wq(struct rr_q_head *head);
 
 void round_robin(Process* process_array, int num_processes, int init_tq, char* outbuf) {
-    struct stailhead head; // Head of the waiting queue
-    struct entry *wqp; // Pointer to a waiting process
-    struct entry *rqp; // Pointer to the running process (queue entry)
+    struct rr_q_head head; // Head of the waiting queue
+    struct rr_q_item *wqp; // Pointer to a waiting process
+    struct rr_q_item *rqp; // Pointer to the running process (queue rr_q_item)
     Process *running_process;
     int i;
     int offset = 0;
@@ -37,7 +38,7 @@ void round_robin(Process* process_array, int num_processes, int init_tq, char* o
         // Add new processes to waiting queue
         for (i = 1; i <= num_processes; i++) {
             if (process_array[i].arrival_time == t) {
-                wqp = malloc(sizeof(struct entry));
+                wqp = malloc(sizeof(struct rr_q_item));
                 STAILQ_INSERT_TAIL(&head, wqp, entries);
                 wqp->process = malloc(sizeof(Process*));
                 wqp->process = &process_array[i];
@@ -62,7 +63,7 @@ void round_robin(Process* process_array, int num_processes, int init_tq, char* o
         if (running_process->burst_time == 0) {
              if (STAILQ_EMPTY(&head)) {
                 running_process->has_cpu = 0;
-                printf("Last Process %d terminated\n", running_process->pid);
+                printf("Process %d terminated\n", running_process->pid);
                 break;
              }
             running_process->has_cpu = 0;
@@ -84,7 +85,7 @@ void round_robin(Process* process_array, int num_processes, int init_tq, char* o
                     running_process->has_cpu = 0;
                     STAILQ_REMOVE_HEAD(&head, entries);
                     q_size -= 1;
-                    printf("Last Process %d terminated\n", running_process->pid);
+                    printf("Process %d terminated\n", running_process->pid);
                     break;
                 } 
             } else if (running_process->burst_time == 0) {
@@ -94,13 +95,12 @@ void round_robin(Process* process_array, int num_processes, int init_tq, char* o
                 printf("Process %d terminated\n", running_process->pid);
             } else {
                 running_process->has_cpu = 0;
-                struct entry *tqp = malloc(sizeof(struct entry));
+                struct rr_q_item *tqp = malloc(sizeof(struct rr_q_item));
                 tqp->process = malloc(sizeof(Process*));
                 tqp->process = running_process;
                 STAILQ_INSERT_TAIL(&head, tqp, entries);
                 running_process = STAILQ_FIRST(&head)->process;
                 STAILQ_REMOVE_HEAD(&head, entries);
-
                 printf("Process %d preempted\n", running_process->pid);
             }
             tq = init_tq;
@@ -125,13 +125,12 @@ void round_robin(Process* process_array, int num_processes, int init_tq, char* o
         total_wait_time += process_array[i].wait_time;
     }
     // printf("Average wait time: %f\n", (float)total_wait_time / num_processes);
-    offset += sprintf(outbuf + offset, "Average wait time: %f\n", (float)total_wait_time / num_processes);
-    write_file("output.txt", outbuf);
+    offset += sprintf(outbuf + offset, "AVG Waiting Time: %.2f\n", (float)total_wait_time / num_processes);
 }
 
 // Print waiting queue
-void print_wq(struct stailhead *head) {
-    struct entry *wqp;
+void print_wq(struct rr_q_head *head) {
+    struct rr_q_item *wqp;
     printf("Processes in waiting queues: \n");
     STAILQ_FOREACH(wqp, head, entries) {
         printf("%d\n", wqp->process->pid);

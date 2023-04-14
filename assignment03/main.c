@@ -3,6 +3,7 @@
 #include <string.h>
 #include "helper.h"
 #include "round_robin.h"
+#include "sjf.h"
 
 #define RR 1
 #define SJF 2
@@ -18,7 +19,7 @@ int main() {
     Process* process_array; 
     int i = 1;
     
-    process_array = load_file("./test_cases/input15.txt"); //TODO: Change this to just "input.txt" before submitting
+    process_array = load_file("./test_cases/input1.txt"); //TODO: Change this to just "input.txt" before submitting
     memcpy(&header, &process_array[0], sizeof(Header));
     
     switch (header.algorithm) {
@@ -29,6 +30,8 @@ int main() {
                 printf("%d\t\t%d\t\t\t%d\t\t\t%d\n", process_array[i].pid, process_array[i].arrival_time, process_array[i].burst_time, process_array[i].priority);
             }
             round_robin(process_array, header.num_processes, header.time_quantum, outbuf);
+            write_file("output.txt", outbuf);
+            printf("Output written to output.txt\n");
             break;
         case SJF:
             printf("Algorithm: SJF\t\tNumber of Processes: %d\n\n", header.num_processes);
@@ -36,7 +39,9 @@ int main() {
             for ( ; i <= header.num_processes; i++) {
                 printf("%d\t\t%d\t\t\t%d\t\t\t%d\n", process_array[i].pid, process_array[i].arrival_time, process_array[i].burst_time, process_array[i].priority);
             }
-            // Run algorithm
+            sjf(process_array, header.num_processes, outbuf);
+            write_file("output.txt", outbuf);
+            printf("Output written to output.txt\n");
             break;
         case PR_NO_PREMP:
             printf("Algorithm: Priority with no Preemption\t\tNumber of Processes: %d\n\n", header.num_processes);

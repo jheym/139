@@ -28,7 +28,11 @@ typedef struct Header {
     int reserved;
 } Header;
 
+/* Forward Declarations */
 Process* load_file(char* filename);
+int append_to_outbuf(Process *process, char *buffer, int offset);
+void write_file(char* filename, char* outbuf);
+
 
 /**
  * Loads the input file and returns a pointer to the process array
@@ -120,11 +124,25 @@ Process* load_file(char* filename) {
     return process_array;
 }
 
-int append_to_outbuf(Process *process, char *buffer, int offset) {
-    offset += sprintf(buffer + offset, "%d\t%d\n", process->start_time, process->pid);
+/**
+ * Appends the process information to the output outbuf
+ * 
+ * @param process Pointer to a process to append to the output outbuf
+ * @param outbuf The outbuf to append to
+ * @param offset The offset to append at
+ * @return The new offset
+*/
+int append_to_outbuf(Process *process, char *outbuf, int offset) {
+    offset += sprintf(outbuf + offset, "%d\t\t%d\n", process->start_time, process->pid);
     return offset;
 }
 
+/**
+ * Writes the output buffer to the output file
+ * 
+ * @param filename The name of the output file
+ * @param outbuf The output buffer
+*/
 void write_file(char* filename, char* outbuf) {
     FILE *fp;
     fp = fopen(filename, "w");
